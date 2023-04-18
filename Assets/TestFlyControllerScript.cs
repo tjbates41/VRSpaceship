@@ -7,51 +7,93 @@ public class TestFlyControllerScript : MonoBehaviour
 {
 
     [SerializeField]
-    float rotateSpeed;
-
-    [SerializeField]
-    float turnSpeed;
-
-    [SerializeField]
     float speed;
 
-    [SerializeField]
-    float downAndUpSpeed;
+    float jointState1;
+    float jointState2;
+    float horz_speed;
+    float ver_speed;
 
-    float throttle_left_jointState;
-    float thruster_speed;
+    public string joystickHandleName = "CockpitEquipments_Joystick2-Handle"; // Name of the joystick handle object
+    public float rollSpeed = 1.0f; // Roll speed multiplier
+    public float pitchSpeed = 1.0f; // Pitch speed multiplier
+    public float yawSpeed = 0.5f; // Yaw speed multiplier
+
+    private Transform joystickHandle;
+    GameObject throttle1,throttle2;
 
     // Start is called before the first frame update
     void Start()
     {
-
+      joystickHandle = GameObject.Find(joystickHandleName).transform;
+      throttle1 = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle1");
+      throttle2 = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle2");
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
 	
-    	GameObject throttle_left = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle2");
-	GameObject throttle_right = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle1");
+    //GameObject throttle = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle2");
 
+    VG_Controller.GetObjectJointState(throttle1.transform, out jointState1);
+    VG_Controller.GetObjectJointState(throttle2.transform, out jointState2);
+    /*
 	
-	VG_Controller.GetObjectJointState(throttle_left.transform, out throttle_left_jointState);
-	if (throttle_left_jointState < -30) {
-		thruster_speed = -1;
+    if (jointState1 < -20) {
+		horz_speed = -1;
 	}
-	else if(throttle_left_jointState > 30) {
-		thruster_speed = 1;
+	else if(jointState1 > 20) {
+		horz_speed = 1;
 	}
 	else {
-		thruster_speed = 0;
-	}
+		horz_speed = 0;
+	}    
 	
-        transform.Rotate(new Vector3(0, 0, -1) * rotateSpeed * Input.GetAxis("Roll") * Time.deltaTime);
+	if (jointState2 < -20) {
+		ver_speed = -1;
+	}
+	else if(jointState2 > 20) {
+		ver_speed = 1;
+	}
+	else {
+		ver_speed = 0;
+	}
+	*/
 
-        transform.Rotate(new Vector3(1, 0, 0) * downAndUpSpeed * Input.GetAxis("UpDown") * Time.deltaTime);
+        transform.Translate(new Vector3(0, 0, 1) * speed * (jointState1/10.0f) * Time.deltaTime);
 
-        transform.Rotate(new Vector3(0, 1, 0) * turnSpeed * thruster_speed * Time.deltaTime);
+        transform.Translate(new Vector3(0, 1, 0) * speed * (jointState2/10.0f) * Time.deltaTime);
+        
+    float swingAngle = joystickHandle.localEulerAngles.x;
+    float twistAngle = joystickHandle.localEulerAngles.z;
+    float thirdAngle = joystickHandle.localEulerAngles.y;
 
-        transform.Translate(new Vector3(0, 0, -1) * speed * Input.GetAxis("Vertical") * Time.deltaTime);
+        // Convert the swing angle to a value between -180 and 180 degrees
+        if (swingAngle > 180)
+        {
+            swingAngle -= 360;
+        }
+
+        // Convert the twist angle to a value between -180 and 180 degrees
+        if (twistAngle > 180)
+        {
+            twistAngle -= 360;
+        }
+        if (thirdAngle > 180)
+        {
+            thirdAngle -= 360;
+        }
+
+        // Update the spaceship's rotation based on the twist angle (yaw)
+        transform.Rotate(Vector3.up, thirdAngle * yawSpeed * Time.deltaTime);
+
+        // Update the spaceship's rotation based on the swing angle (pitch)
+        transform.Rotate(Vector3.right, swingAngle * pitchSpeed * Time.deltaTime);
+
+        // Update the spaceship's rotation based on the twist angle (roll)
+        transform.Rotate(Vector3.forward, twistAngle * rollSpeed * Time.deltaTime);
+     
+
     }
 }
