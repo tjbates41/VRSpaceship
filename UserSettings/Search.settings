@@ -7,9 +7,9 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.DA949528" = "input"
+	"last_search.DA949528" = "project settings"
 	"OpenInspectorPreview.DA949528" = "0"
-	"currentGroup.DA949528" = "settings"
+	"currentGroup.DA949528" = "all"
 }
 providers = {
 	adb = {
@@ -56,6 +56,14 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"pre"
+	"a"
+	"s"
+	"ma"
+	"re"
+	"p"
+	"pa"
+	"pac"
 ]
 searchItemFavorites = [
 ]
