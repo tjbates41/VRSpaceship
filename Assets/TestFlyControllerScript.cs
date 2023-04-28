@@ -7,19 +7,12 @@ public class TestFlyControllerScript : MonoBehaviour
 {
 
     [SerializeField]
-    float thruster_speed;
+    float speed;
 
-    [SerializeField]
-    float rotateSpeed;
-
-    private float throttle_left_jointState;
-	private float throttle_right_jointState;
-	private float horz_direction;
-	private float vert_direction;
-	
-	//private Rigidbody rb;
-	private GameObject throttle_left;
-	private GameObject throttle_right;
+    float jointState1;
+    float jointState2;
+    float horz_speed;
+    float ver_speed;
 
     public string joystickHandleName = "CockpitEquipments_Joystick2-Handle"; // Name of the joystick handle object
     public float rollSpeed = 1.0f; // Roll speed multiplier
@@ -33,62 +26,50 @@ public class TestFlyControllerScript : MonoBehaviour
     void Start()
     {
       joystickHandle = GameObject.Find(joystickHandleName).transform;
-      throttle_left = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle2");
-	  throttle_right = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle1");
+      throttle1 = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle1");
+      throttle2 = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle2");
     }
 
-    // Update is called once per frames
+    // Update is called once per frame
     void FixedUpdate()
     {
 	
     //GameObject throttle = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle2");
 
-    VG_Controller.GetObjectJointState(throttle_left.transform, out throttle_left_jointState);
-	VG_Controller.GetObjectJointState(throttle_right.transform, out throttle_right_jointState);
+    VG_Controller.GetObjectJointState(throttle1.transform, out jointState1);
+    VG_Controller.GetObjectJointState(throttle2.transform, out jointState2);
     
 	
-    if (throttle_left_jointState < -15 && throttle_right_jointState < -15) { // backwards
-			horz_direction = 0;
-			vert_direction = -1;
-		}
-		else if(throttle_left_jointState > 15 && throttle_right_jointState > 15) { // forwards
-			horz_direction = 0;
-			vert_direction = 1;
-		}
-		else if(throttle_left_jointState > 15 && throttle_right_jointState < 15 && throttle_right_jointState > -15) { // turn right
-			horz_direction = -1;
-			vert_direction = 0;
-		}
-		else if(throttle_left_jointState > 15 && throttle_right_jointState < -15) { // turn right faster
-			horz_direction = -2;
-			vert_direction = 0;
-		}
-		else if(throttle_right_jointState > 15 && throttle_left_jointState < 15 && throttle_left_jointState > -15) { // turn left
-			horz_direction = 1;
-			vert_direction = 0;
-		}
-		else if(throttle_right_jointState > 15 && throttle_left_jointState < -15) { // turn left faster
-			horz_direction = 2;
-			vert_direction = 0;
-		}
-		else if(throttle_left_jointState < -15 && throttle_right_jointState < 15 && throttle_right_jointState > -15) { // turn left
-			horz_direction = 1;
-			vert_direction = 0;
-		}
-		else if(throttle_right_jointState < -15 && throttle_left_jointState < 15 && throttle_left_jointState > -15) { // turn right
-			horz_direction = -1;
-			vert_direction = 0;
-		}
-		else {
-			horz_direction = 0;
-			vert_direction = 0;
-		}
+    if (jointState1 < -30) {
+		horz_speed = -1;
+	}
+	else if(jointState1 > 30) {
+		horz_speed = 1;
+	}
+	else {
+		horz_speed = 0;
+	}    
+	
+	if (jointState2 < -30) {
+		ver_speed = -1;
+	}
+	else if(jointState2 > 30) {
+		ver_speed = 1;
+	}
+	else {
+		ver_speed = 0;
+	}
+	
 
-        transform.Rotate(new Vector3(0, 1, 0) * rotateSpeed * horz_direction * Time.deltaTime);
-		transform.Translate(new Vector3(0, 0, -1) * thruster_speed * vert_direction * Time.deltaTime);
+        transform.Translate(new Vector3(0, 0, 1) * speed * (jointState1/100.0f) * Time.deltaTime);
+
+        transform.Translate(new Vector3(0, 0, -1) * speed * (jointState2/100.0f) * Time.deltaTime);
+        
+        //transform.Rotate(new Vector3(0, 0, 1) * speed * ver_speed * Time.deltaTime);
+        //transform.Rotate(new Vector3(0, -1, 0) * speed * horz_speed * Time.deltaTime);
         
     float swingAngle = joystickHandle.localEulerAngles.x;
-    //float twistAngle = joystickHandle.localEulerAngles.z;
+    float twistAngle = joystickHandle.localEulerAngles.z;
     float thirdAngle = joystickHandle.localEulerAngles.y;
 
         // Convert the swing angle to a value between -180 and 180 degrees
@@ -98,7 +79,6 @@ public class TestFlyControllerScript : MonoBehaviour
         }
 
         // Convert the twist angle to a value between -180 and 180 degrees
-        /*
         if (twistAngle > 180)
         {
             twistAngle -= 360;
@@ -107,7 +87,7 @@ public class TestFlyControllerScript : MonoBehaviour
         {
             thirdAngle -= 360;
         }
-        */
+
         // Update the spaceship's rotation based on the twist angle (yaw)
         transform.Rotate(Vector3.up, thirdAngle * yawSpeed * Time.deltaTime);
 
@@ -115,7 +95,7 @@ public class TestFlyControllerScript : MonoBehaviour
         transform.Rotate(Vector3.right, swingAngle * pitchSpeed * Time.deltaTime);
 
         // Update the spaceship's rotation based on the twist angle (roll)
-    //#transform.Rotate(Vector3.forward, twistAngle * rollSpeed * Time.deltaTime);
+        transform.Rotate(Vector3.forward, twistAngle * rollSpeed * Time.deltaTime);
      
 
     }
