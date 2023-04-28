@@ -37,7 +37,7 @@ public class TestFlyControllerScript : MonoBehaviour
 	  throttle_right = GameObject.Find("CockpitEquipments_ThrottleControl1-Handle1");
     }
 
-    // Update is called once per frame
+    // Update is called once per frames
     void FixedUpdate()
     {
 	
