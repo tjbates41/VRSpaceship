@@ -5,9 +5,9 @@ public class Breakable : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.relativeVelocity.magnitude > _breakForce)
-        {
-            GetComponent<Fracture>().FractureObject(transform.localScale);
-        }
+        //if (collision.relativeVelocity.magnitude > _breakForce)
+        //{
+           GetComponent<Fracture>().FractureObject(transform.localScale);
+        //}
     }
 }
